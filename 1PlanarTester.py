@@ -12,6 +12,7 @@ def generateE(G):
     n = len(l1)
     #create the list of all crossing pairs, indexing j at 1 to kick out diagonals
     #atm this includes crossings from the same vertex which is unnecessary but otherwise its messy
+    #no difference atm
     for i in range(n):
         for j in range(n-i-1):
             l2.append((l1[i], l1[j+1]))
