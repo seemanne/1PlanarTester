@@ -40,7 +40,7 @@ def searchTree(y, G, E):
     if(x == 2):
         return 2, None
 
-#todo: the following three functions can be merged together to save time
+#todo: the following three functions can be merged together to save time and space
 
 def checkLegalCrossings(y, E):
     S = {}
