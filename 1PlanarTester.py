@@ -104,6 +104,25 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     Gv.add_edges_from(edgeList)
     return Gv
 
+def createCrossVertices(y, G, E):
+    #figure out the size of the graph so we know how to label our edges, keep in mind that the label of the last vertex is n-1 (index at zero but count at 1)
+    n = len(G)
+    m = len(y)
+    j = 0
+    #iteratively construct the planarization of G using the crossings for y and E
+    for i in range(m):
+        if (y[i] == 1):
+            (v1, v2) = E[i][0]
+            (w1, w2) = E[i][1]
+            G.remove_edge(v1, v2)
+            G.remove_edge(w1, w2)
+            G.add_edge(v1, n+j)
+            G.add_edge(v2, n+j)
+            G.add_edge(w1, n+j)
+            G.add_edge(w2, n+j)
+            j += 1
+    return G
+
 
 
     
@@ -115,8 +134,8 @@ def verifyNode(y, G, E):
     kite_edges = findKiteEdges(y, E, am)
     if(cross_edges.intersection(kite_edges) != {}): return 2
 
-    Gv = ComputeInducedGraph(y, G, E)
-    Gstar = CreateCrossVertices(y, G, E)
+    Gv = computeInducedGraph(y, G, E)
+    Gstar = createCrossVertices(y, G, E)
 
     if(nx.check_planarity(Gstar)):
         if(Gv == G): return 0
