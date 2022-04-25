@@ -44,7 +44,7 @@ def searchTree(y, G, E):
 #todo: the following three functions can be merged together to save time and space
 
 def checkLegalCrossings(y, E):
-    S = {}
+    S = set()
     n = len(y)
     for i in range(n):
         if (y[i] == 1):
@@ -55,7 +55,7 @@ def checkLegalCrossings(y, E):
 
 #returns a set containing all edges that are crossed, without caring about the edges they are crossed with
 def findCrossedEdges(y, E):
-    S = {}
+    S = set()
     n = len(y)
     for i in range(n):
         if (y[i] == 1):
@@ -65,7 +65,7 @@ def findCrossedEdges(y, E):
 #returs a set containing all edges that are element of a kite in the drawing (even if the full kite doesn't exist)
 def findKiteEdges(y, E, am):
     n = len(y)
-    S = {}
+    S = set()
     for i in range(n):
         if (y[i] == 1):
             v1, v2 = E[i][0][0], E[i][0][1]
@@ -143,3 +143,16 @@ def verifyNode(y, G, E):
             return 1
     else:
         return 2
+
+adjacency_dict = {
+0: (1, 2, 3, 4, 5, 6, 7),
+1: (0, 2, 3, 4, 5, 6),
+2: (0, 1, 3),
+3: (0, 1, 2, 4, 5, 7),
+4: (0, 1, 3, 5, 6, 7),
+5: (0, 1, 3, 4, 6, 7),
+6: (0, 1, 4, 5, 7),
+7: (0, 3, 4, 5, 6)}
+G = nx.Graph(adjacency_dict)
+x, y = searchTree([0], G, generateE(G))
+print(x, y)
