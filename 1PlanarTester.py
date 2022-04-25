@@ -22,20 +22,25 @@ def generateE(G):
 
 
 def searchTree(y, G, E):
+    #0 = SOL, 1 = CNT, 2 = CUT
     x = verifyNode(y, G, E)
     if (x==0): return 0,y
     if (x==1):
         rand = rd.random()
+        y1 = y.copy()
+        y0 = y.copy()
+        y1.append(1)
+        y0.append(0)
         if (rand > 0.5):
-            r,r_y = searchTree(y.append(1), G, E)
+            r,r_y = searchTree(y1, G, E)
             if (r == 0): return 0, r_y
-            r,r_y = searchTree(y.append(0), G, E)
+            r,r_y = searchTree(y0, G, E)
             if (r == 0): return 0, r_y
             return 2, None
         else:
-            r,r_y = searchTree(y.append(0), G, E)
+            r,r_y = searchTree(y0, G, E)
             if (r == 0): return 0, r_y
-            r, r_y = searchTree(y.append(1), G, E)
+            r, r_y = searchTree(y1, G, E)
             if (r == 0): return 0, r_y
             return 2, None
     if(x == 2):
@@ -48,7 +53,7 @@ def checkLegalCrossings(y, E):
     n = len(y)
     for i in range(n):
         if (y[i] == 1):
-            if (S.intersect({E[i][0], E[i][1]}) == {}):
+            if (S.intersection({E[i][0], E[i][1]}) == {}):
                 S.union({E[i][0], E[i][1]})
             else: return False
     return True
@@ -92,7 +97,7 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
         for j in range(b-2):
             edgeList.append([a, b+1])
     #add [a, b] to the edge list if the next crossing in E starts with a different edge
-    if (E[index+1][0] != np.array([(a, b)])):
+    if (not np.array_equal(E[index+1][0], np.array((a, b)))):
         edgeList.append([a, b])
     #we do not implement c because its too expensive to check with too little gain (we need to check almost n^2 edges for every edge and its rarely true)
     #edges of type d)
@@ -128,13 +133,14 @@ def createCrossVertices(y, G, E):
     
 
 def verifyNode(y, G, E):
+    #0 = SOL, 1 = CNT, 2 = CUT
     am = nx.to_numpy_array(G) #gives us the adjacency matrix as an np array
     if(not checkLegalCrossings(y, E)): return 2
     cross_edges = findCrossedEdges(y, E)
     kite_edges = findKiteEdges(y, E, am)
-    if(cross_edges.intersection(kite_edges) != {}): return 2
+    if(cross_edges.intersection(kite_edges) != set()): return 2
 
-    Gv = computeInducedGraph(y, G, E)
+    Gv = computeInducedGraph(y, G, E, am, cross_edges, kite_edges)
     Gstar = createCrossVertices(y, G, E)
 
     if(nx.check_planarity(Gstar)):
