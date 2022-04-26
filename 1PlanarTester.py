@@ -4,6 +4,7 @@ import random as rd
 import numpy as np
 
 #we generate the set E exactly once to save time by preprocessing, the set itself doesn't change throughout the code
+#E has the shape [[[a1, b1],[x1, y1]]...[[an, bm],[xj, yk]]], so E[i] is the ith crossing pair, E[i][0] the first edge of the ith crossing
 def generateE(G):
     l1 = []
     l2 = []
@@ -31,7 +32,7 @@ def searchTree(y, G, E):
         y0 = y.copy()
         y1.append(1)
         y0.append(0)
-        if (rand > 0.5):
+        if (rand > 0.2):
             r,r_y = searchTree(y1, G, E)
             if (r == 0): return 0, r_y
             r,r_y = searchTree(y0, G, E)
@@ -53,8 +54,8 @@ def checkLegalCrossings(y, E):
     n = len(y)
     for i in range(n):
         if (y[i] == 1):
-            if (S.intersection({E[i][0], E[i][1]}) == {}):
-                S.union({E[i][0], E[i][1]})
+            if (S.intersection({(E[i][0][0], E[i][0][1]), (E[i][1][0], E[i][1][1])}) == set()):
+                S = S.union({(E[i][0][0], E[i][0][1]), (E[i][1][0], E[i][1][1])})
             else: return False
     return True
 
@@ -64,7 +65,7 @@ def findCrossedEdges(y, E):
     n = len(y)
     for i in range(n):
         if (y[i] == 1):
-            S.union({E[i][0], E[i][1]})
+            S = S.union({(E[i][0][0], E[i][0][1]), (E[i][1][0], E[i][1][1])})
     return S
     
 #returs a set containing all edges that are element of a kite in the drawing (even if the full kite doesn't exist)
@@ -75,10 +76,10 @@ def findKiteEdges(y, E, am):
         if (y[i] == 1):
             v1, v2 = E[i][0][0], E[i][0][1]
             w1, w2 = E[i][1][0], E[i][1][1]
-            if(am[v1][w1] == 1): S.add([v1, w1])
-            if(am[v1][w2] == 1): S.add([v1, w2])
-            if(am[v2][w1] == 1): S.add([v2, w1])
-            if(am[v2][w2] == 1): S.add([v2, w2])
+            if(am[v1][w1] == 1): S.add((v1, w1))
+            if(am[v1][w2] == 1): S.add((v1, w2))
+            if(am[v2][w1] == 1): S.add((v2, w1))
+            if(am[v2][w2] == 1): S.add((v2, w2))
     return S
 
 def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
@@ -86,7 +87,7 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     #edges of type a)
     n = len(cross_edges)
     for i in range(n):
-        edgeList.append(cross_edges[i])
+        edgeList.append(list(cross_edges)[i])
     #edges of type b)
     index = len(y)
     #E[i] has shape [[a b][x y]]
@@ -95,15 +96,15 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     for i in range(a):
         #we use b-2 here because we want to add edges up to [a b-1] but need to care not to add edges like [0 0]
         for j in range(b-2):
-            edgeList.append([a, b+1])
+            edgeList.append((a, b+1))
     #add [a, b] to the edge list if the next crossing in E starts with a different edge
     if (not np.array_equal(E[index+1][0], np.array((a, b)))):
-        edgeList.append([a, b])
+        edgeList.append((a, b))
     #we do not implement c because its too expensive to check with too little gain (we need to check almost n^2 edges for every edge and its rarely true)
     #edges of type d)
     n = len(kite_edges)
     for i in range(n):
-        edgeList.add(kite_edges[i])
+        edgeList.append(list(kite_edges)[i])
     #build the graph Gv
     Gv = nx.Graph()
     Gv.add_edges_from(edgeList)
@@ -138,13 +139,15 @@ def verifyNode(y, G, E):
     if(not checkLegalCrossings(y, E)): return 2
     cross_edges = findCrossedEdges(y, E)
     kite_edges = findKiteEdges(y, E, am)
+    #note that the check below also takes care of crossings of type (a, b), (b, c) as that makes the crossing edges show up as kite edges
+    #while this wasn't intended it works so it stays in, there might be a more elegant way of checking for this exception
     if(cross_edges.intersection(kite_edges) != set()): return 2
 
     Gv = computeInducedGraph(y, G, E, am, cross_edges, kite_edges)
     Gstar = createCrossVertices(y, G, E)
 
     if(nx.check_planarity(Gstar)):
-        if(Gv == G): return 0
+        if(nx.utils.graphs_equal(Gv, G)): return 0
         else:
             return 1
     else:
