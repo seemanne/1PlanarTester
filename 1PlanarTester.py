@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import random as rd
 import numpy as np
 
+rd.seed(0)
+
 #we generate the set E exactly once to save time by preprocessing, the set itself doesn't change throughout the code
 #E has the shape [[[a1, b1],[x1, y1]]...[[an, bm],[xj, yk]]], so E[i] is the ith crossing pair, E[i][0] the first edge of the ith crossing
 def generateE(G):
@@ -98,8 +100,12 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
         for j in range(b-2):
             edgeList.append((a, b+1))
     #add [a, b] to the edge list if the next crossing in E starts with a different edge
-    if (not np.array_equal(E[index+1][0], np.array((a, b)))):
+    #to prevent an index out of bounds error on the last pass we add the check
+    if (index == len(E)-1):
         edgeList.append((a, b))
+    else: 
+        if(not np.array_equal(E[index+1][0], np.array((a, b)))): 
+            edgeList.append((a, b))
     #we do not implement c because its too expensive to check with too little gain (we need to check almost n^2 edges for every edge and its rarely true)
     #edges of type d)
     n = len(kite_edges)
@@ -115,19 +121,21 @@ def createCrossVertices(y, G, E):
     n = len(G)
     m = len(y)
     j = 0
+    Gtemp = nx.Graph()
+    Gtemp.add_edges_from(G.edges)
     #iteratively construct the planarization of G using the crossings for y and E
     for i in range(m):
         if (y[i] == 1):
             (v1, v2) = E[i][0]
             (w1, w2) = E[i][1]
-            G.remove_edge(v1, v2)
-            G.remove_edge(w1, w2)
-            G.add_edge(v1, n+j)
-            G.add_edge(v2, n+j)
-            G.add_edge(w1, n+j)
-            G.add_edge(w2, n+j)
+            Gtemp.remove_edge(v1, v2)
+            Gtemp.remove_edge(w1, w2)
+            Gtemp.add_edge(v1, n+j)
+            Gtemp.add_edge(v2, n+j)
+            Gtemp.add_edge(w1, n+j)
+            Gtemp.add_edge(w2, n+j)
             j += 1
-    return G
+    return Gtemp
 
 
 
