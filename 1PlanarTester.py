@@ -36,7 +36,7 @@ def searchTree(y, G, E):
         y0 = y.copy()
         y1.append(1)
         y0.append(0)
-        if (rand > 0.2):
+        if (rand > 0.8):
             r,r_y = searchTree(y1, G, E)
             if (r == 0): return 0, r_y
             r,r_y = searchTree(y0, G, E)
@@ -103,7 +103,7 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     for i in range(a):
         #we use b-2 here because we want to add edges up to [a b-1] but need to care not to add edges like [0 0]
         for j in range(b-2):
-            edgeList.append((a, b+1))
+            edgeList.append((i, j+1))
     #add [a, b] to the edge list if the next crossing in E starts with a different edge
     #to prevent an index out of bounds error on the last pass we add the check
     if (index == len(E)-1):
@@ -157,10 +157,12 @@ def verifyNode(y, G, E):
     if(cross_edges.intersection(kite_edges) != set()): return 2
 
     Gv = computeInducedGraph(y, G, E, am, cross_edges, kite_edges)
-    Gstar = createCrossVertices(y, G, E)
+    Gstar = createCrossVertices(y, Gv, E)
 
-    if(nx.check_planarity(Gstar)):
-        if(nx.utils.graphs_equal(Gv, G)): return 0
+    if(nx.check_planarity(Gstar)[0]):
+        if(nx.utils.graphs_equal(Gv, G)):
+            nx.draw_planar(Gstar) 
+            return 0
         else:
             return 1
     else:
@@ -177,4 +179,5 @@ adjacency_dict = {
 7: (0, 3, 4, 5, 6)}
 G = nx.Graph(adjacency_dict)
 x, y = searchTree([0], G, generateE(G))
+plt.show()
 print(x, y)
