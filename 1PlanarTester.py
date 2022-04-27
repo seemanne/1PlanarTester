@@ -26,6 +26,8 @@ def generateE(G):
 
 def searchTree(y, G, E):
     #0 = SOL, 1 = CNT, 2 = CUT
+    if(len(y) > len(E)):
+        return 2, None
     x = verifyNode(y, G, E)
     if (x==0): return 0,y
     if (x==1):
@@ -86,12 +88,15 @@ def findKiteEdges(y, E, am):
 
 def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     edgeList = []
+    Gv = nx.Graph()
     #edges of type a)
     n = len(cross_edges)
     for i in range(n):
         edgeList.append(list(cross_edges)[i])
     #edges of type b)
-    index = len(y)
+    index = len(y)-1
+    if (index > 230):
+        print('clownmode')
     #E[i] has shape [[a b][x y]]
     a = E[index][0][0]
     b = E[index][0][1]
@@ -102,7 +107,8 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     #add [a, b] to the edge list if the next crossing in E starts with a different edge
     #to prevent an index out of bounds error on the last pass we add the check
     if (index == len(E)-1):
-        edgeList.append((a, b))
+        Gv.add_edges_from(G.edges)
+        #The argument here is that on the last pass the induced graph has to be the full graph
     else: 
         if(not np.array_equal(E[index+1][0], np.array((a, b)))): 
             edgeList.append((a, b))
@@ -112,7 +118,6 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     for i in range(n):
         edgeList.append(list(kite_edges)[i])
     #build the graph Gv
-    Gv = nx.Graph()
     Gv.add_edges_from(edgeList)
     return Gv
 
