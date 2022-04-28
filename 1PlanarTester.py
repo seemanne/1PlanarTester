@@ -18,7 +18,10 @@ def generateE(G):
     #no difference atm
     for i in range(n):
         for j in range(n-i-1):
-            l2.append((l1[i], l1[i+j+1]))
+            #nx.edges will always give us the edges in the format [a, b] where a \leq b, we abuse this in the following process
+            print(l1[i], l1[i+j+1])
+            if(l1[i][0]!=l1[i+j+1][0] and l1[i][1] != l1[i+j+1][0] and l1[i][1] != l1[i+j+1][1]):
+                l2.append((l1[i], l1[i+j+1]))
     E = np.array(l2)
     return E
 
