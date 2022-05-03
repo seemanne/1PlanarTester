@@ -2,6 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random as rd
 import numpy as np
+import sys
 
 rd.seed(0)
 
@@ -153,12 +154,16 @@ def createCrossVertices(y, G, E):
 def verifyNode(y, G, E):
     #0 = SOL, 1 = CNT, 2 = CUT
     am = nx.to_numpy_array(G) #gives us the adjacency matrix as an np array
-    if(not checkLegalCrossings(y, E)): return 2
+    if(not checkLegalCrossings(y, E)): 
+        print("Failed legal crossing check: ", y)
+        return 2
     cross_edges = findCrossedEdges(y, E)
     kite_edges = findKiteEdges(y, E, am)
     #note that the check below also takes care of crossings of type (a, b), (b, c) as that makes the crossing edges show up as kite edges
     #while this wasn't intended it works so it stays in, there might be a more elegant way of checking for this exception
-    if(cross_edges.intersection(kite_edges) != set()): return 2
+    if(cross_edges.intersection(kite_edges) != set()): 
+        print("Failed cross/kite check: ", y)
+        return 2
 
     Gv = computeInducedGraph(y, G, E, am, cross_edges, kite_edges)
     Gstar = createCrossVertices(y, Gv, E)
@@ -166,10 +171,12 @@ def verifyNode(y, G, E):
     if(nx.check_planarity(Gstar)[0]):
         if(nx.utils.graphs_equal(Gv, G)):
             nx.draw_planar(Gstar) 
+            print(" Found planar drawing of G", y)
             return 0
         else:
             return 1
     else:
+        print("Failed planarity check: ", y)
         return 2
 
 adjacency_dict = {
@@ -181,7 +188,9 @@ adjacency_dict = {
 5: (0, 1, 3, 4, 6, 7),
 6: (0, 1, 4, 5, 7),
 7: (0, 3, 4, 5, 6)}
+sys.stdout = open("log.txt", "w")
 G = nx.Graph(adjacency_dict)
 x, y = searchTree([0], G, generateE(G))
+sys.stdout.close()
 plt.show()
 print(x, y)
