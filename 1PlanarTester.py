@@ -20,7 +20,6 @@ def generateE(G):
     for i in range(n):
         for j in range(n-i-1):
             #nx.edges will always give us the edges in the format [a, b] where a \leq b, we abuse this in the following process
-            print(l1[i], l1[i+j+1])
             if(l1[i][0]!=l1[i+j+1][0] and l1[i][1] != l1[i+j+1][0] and l1[i][1] != l1[i+j+1][1]):
                 l2.append((l1[i], l1[i+j+1]))
     E = np.array(l2)
@@ -126,13 +125,13 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     Gv.add_edges_from(edgeList)
     return Gv
 
-def createCrossVertices(y, G, E):
+def createCrossVertices(y, Gv, E):
     #figure out the size of the graph so we know how to label our edges, keep in mind that the label of the last vertex is n-1 (index at zero but count at 1)
-    n = len(G)
     m = len(y)
-    j = 1
+    j = 0
     Gtemp = nx.Graph()
-    Gtemp.add_edges_from(G.edges)
+    Gtemp.add_edges_from(Gv.edges)
+    n = len(Gtemp)
     #iteratively construct the planarization of G using the crossings for y and E
     for i in range(m):
         if (y[i] == 1):
@@ -170,7 +169,7 @@ def verifyNode(y, G, E):
 
     if(nx.check_planarity(Gstar)[0]):
         if(nx.utils.graphs_equal(Gv, G)):
-            nx.draw_planar(Gstar) 
+            nx.draw_planar(Gstar, with_labels = True) 
             print(" Found planar drawing of G", y)
             return 0
         else:
@@ -189,8 +188,10 @@ adjacency_dict = {
 6: (0, 1, 4, 5, 7),
 7: (0, 3, 4, 5, 6)}
 sys.stdout = open("log.txt", "w")
-G = nx.Graph(adjacency_dict)
+#G = nx.Graph(adjacency_dict)
+G = nx.complete_graph(5)
+print(generateE(G))
 x, y = searchTree([0], G, generateE(G))
+print(x, y)
 sys.stdout.close()
 plt.show()
-print(x, y)
