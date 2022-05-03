@@ -56,6 +56,7 @@ def searchTree(y, G, E):
 
 #todo: the following three functions can be merged together to save time and space
 
+#checks whether any edge was crossed twice
 def checkLegalCrossings(y, E):
     S = set()
     n = len(y)
@@ -128,7 +129,7 @@ def createCrossVertices(y, G, E):
     #figure out the size of the graph so we know how to label our edges, keep in mind that the label of the last vertex is n-1 (index at zero but count at 1)
     n = len(G)
     m = len(y)
-    j = 0
+    j = 1
     Gtemp = nx.Graph()
     Gtemp.add_edges_from(G.edges)
     #iteratively construct the planarization of G using the crossings for y and E
