@@ -102,29 +102,35 @@ def findKiteEdges(y, E, am):
 def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     edgeList = []
     Gv = nx.Graph()
+    Gv.add_edges_from(G.edges)
     #edges of type a)
     n = len(cross_edges)
     for i in range(n):
         edgeList.append(list(cross_edges)[i])
     #edges of type b)
-    index = len(y)-1
-    if (index > 230):
-        print('clownmode')
+    #complete rework of computeInducedGraph below, now removes edges instead of adding
+    removeEdges = []
+    depth = len(y)
+    m = len(E)
+    for k in range(m-depth):
+        removeEdges.append((E[depth+k][0][0],E[depth+k][0][1]))
+        removeEdges.append((E[depth+k][1][0],E[depth+k][1][1]))
+    Gv.remove_edges_from(removeEdges)
     #E[i] has shape [[a b][x y]]
-    a = E[index][0][0]
-    b = E[index][0][1]
-    for i in range(a):
+    #a = E[index][0][0]
+    #b = E[index][0][1]
+    #for i in range(a):
         #we use b-2 here because we want to add edges up to [a b-1] but need to care not to add edges like [0 0]
-        for j in range(b-2):
-            edgeList.append((i, j+1))
+    #    for j in range(b-2):
+    #        edgeList.append((i, j+1))
     #add [a, b] to the edge list if the next crossing in E starts with a different edge
     #to prevent an index out of bounds error on the last pass we add the check
-    if (index == len(E)-1):
-        Gv.add_edges_from(G.edges)
+    #if (index == len(E)-1):
+    #    Gv.add_edges_from(G.edges)
         #The argument here is that on the last pass the induced graph has to be the full graph
-    else: 
-        if(not np.array_equal(E[index+1][0], np.array((a, b)))): 
-            edgeList.append((a, b))
+    #else: 
+    #    if(not np.array_equal(E[index+1][0], np.array((a, b)))): 
+    #        edgeList.append((a, b))
     #we do not implement c because its too expensive to check with too little gain (we need to check almost n^2 edges for every edge and its rarely true)
     #edges of type d)
     n = len(kite_edges)

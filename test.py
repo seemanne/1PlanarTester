@@ -12,8 +12,8 @@ adjacency_dict = {
 6: (0, 1, 4, 5, 7),
 7: (0, 3, 4, 5, 6)}
 sys.stdout = open("log.txt", "w")
-#G = nx.Graph(adjacency_dict)
-G = nx.complete_graph(6)
+G = nx.Graph(adjacency_dict)
+#G = nx.complete_graph(6)
 E = opt.generateE(G)
 n = len(E)
 yi = []
@@ -29,8 +29,8 @@ for i in range(n):
         j = 1
     yi.append(j)
     #print(i, " ", E[i])
-opt.createLog(1, yi, E, len(G))
-x, y = opt.searchTree(yi, G, E)
+#opt.createLog(1, yi, E, len(G))
+x, y = opt.searchTree([0], G, E)
 print(x, y)
 opt.createLog(x, y, E, len(G))
 sys.stdout.close()

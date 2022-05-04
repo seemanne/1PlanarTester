@@ -2,3 +2,4 @@
 /testscript.py
 log.txt
 .DS_Store
+__pycache__/OnePlanarTester.cpython-39.pyc
