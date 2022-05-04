@@ -6,9 +6,11 @@ import sys
 
 rd.seed(0)
 
-#we generate the set E exactly once to save time by preprocessing, the set itself doesn't change throughout the code
-#E has the shape [[[a1, b1],[x1, y1]]...[[an, bm],[xj, yk]]], so E[i] is the ith crossing pair, E[i][0] the first edge of the ith crossing
+#INPUT: graph G
+#OUTPUT: list of all edge*edge combinations which could represent a legal crossing for G
 def generateE(G):
+    #we generate the set E exactly once to save time by preprocessing, the set itself doesn't change throughout the code
+    #E has the shape [[[a1, b1],[x1, y1]]...[[an, bm],[xj, yk]]], so E[i] is the ith crossing pair, E[i][0] the first edge of the ith crossing
     l1 = []
     l2 = []
     for e in nx.edges(G):
@@ -26,7 +28,8 @@ def generateE(G):
     return E
 
 
-
+#INPUT: indicator y, graph G, edge*edge list E
+#OUTPUT: 0, y' if the subtree rooted at y contains a solution for G with solution indicator y' and 2, None if it doesn't
 def searchTree(y, G, E):
     #0 = SOL, 1 = CNT, 2 = CUT
     if(len(y) > len(E)):
@@ -56,7 +59,8 @@ def searchTree(y, G, E):
 
 #todo: the following three functions can be merged together to save time and space
 
-#checks whether any edge was crossed twice
+#INPUT: indicator y, edge*edge list E
+#OUTPUT: bool which is true if no edge is crossed twice for y
 def checkLegalCrossings(y, E):
     S = set()
     n = len(y)
@@ -67,7 +71,8 @@ def checkLegalCrossings(y, E):
             else: return False
     return True
 
-#returns a set containing all edges that are crossed, without caring about the edges they are crossed with
+#INPUT: indicator y, edge*edge list E
+#OUTPUT: set S containing all eges of G which are crossed for y
 def findCrossedEdges(y, E):
     S = set()
     n = len(y)
@@ -76,7 +81,8 @@ def findCrossedEdges(y, E):
             S = S.union({(E[i][0][0], E[i][0][1]), (E[i][1][0], E[i][1][1])})
     return S
     
-#returs a set containing all edges that are element of a kite in the drawing (even if the full kite doesn't exist)
+#INPUT: indicator y, edge*edge list E, adjacency matrix am
+#OUTPUT: set S containing all edges of G which would be kite edges for crossings in y
 def findKiteEdges(y, E, am):
     n = len(y)
     S = set()
@@ -90,6 +96,9 @@ def findKiteEdges(y, E, am):
             if(am[v2][w2] == 1): S.add((v2, w2))
     return S
 
+
+#INPUT: indicator y, graph G, edge*edge list E, set of crossing edges, set of kite edges
+#OUTPUT: the graph Gv induced by the saturated edges
 def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     edgeList = []
     Gv = nx.Graph()
@@ -125,6 +134,9 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     Gv.add_edges_from(edgeList)
     return Gv
 
+
+#INPUT: indicator y, graph Gv, edge*edge list E
+#OUTPUT: Graph Gtemp representing the planarisation of Gv for the crossings in y
 def createCrossVertices(y, Gv, E):
     #figure out the size of the graph so we know how to label our edges, keep in mind that the label of the last vertex is n-1 (index at zero but count at 1)
     m = len(y)
@@ -149,7 +161,8 @@ def createCrossVertices(y, Gv, E):
 
 
     
-
+#INPUT: indicator y, graph G, edge*edge list E
+#OUTPUT: 0 if y is a solution, 1 if y is potentially part of a solution, 2 if cannot be part of a solution
 def verifyNode(y, G, E):
     #0 = SOL, 1 = CNT, 2 = CUT
     am = nx.to_numpy_array(G) #gives us the adjacency matrix as an np array
