@@ -178,6 +178,19 @@ def verifyNode(y, G, E):
         print("Failed planarity check: ", y)
         return 2
 
+def createLog(x, y, E, n):
+    if(x == 2):
+        return
+    m = len(y)
+    print("Crossings in order: ")
+    j = 0
+    for i in range(m):
+        if(y[i] == 1):
+            print("Vertex ", n+j, " represents the crossing ", E[i])
+            j += 1
+    return
+
+
 adjacency_dict = {
 0: (1, 2, 3, 4, 5, 6, 7),
 1: (0, 2, 3, 4, 5, 6),
@@ -189,9 +202,11 @@ adjacency_dict = {
 7: (0, 3, 4, 5, 6)}
 sys.stdout = open("log.txt", "w")
 #G = nx.Graph(adjacency_dict)
-G = nx.complete_graph(5)
-print(generateE(G))
-x, y = searchTree([0], G, generateE(G))
+G = nx.complete_graph(6)
+E = generateE(G)
+#print(generateE(G))
+x, y = searchTree([0], G, E)
 print(x, y)
+createLog(x, y, E, len(G))
 sys.stdout.close()
 plt.show()
