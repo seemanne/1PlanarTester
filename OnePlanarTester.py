@@ -22,6 +22,7 @@ def generateE(G):
     for i in range(n):
         for j in range(n-i-1):
             #nx.edges will always give us the edges in the format [a, b] where a \leq b, we abuse this in the following process
+            #this scary looking subroutine prevents edges of type [a, b], [a, c] from showing up in E, significantly reducing complexity
             if(l1[i][0]!=l1[i+j+1][0] and l1[i][1] != l1[i+j+1][0] and l1[i][1] != l1[i+j+1][1]):
                 l2.append((l1[i], l1[i+j+1]))
     E = np.array(l2)
