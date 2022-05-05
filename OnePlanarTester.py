@@ -30,11 +30,11 @@ def generateE(G):
 
 #INPUT: indicator y, graph G, edge*edge list E
 #OUTPUT: 0, y' if the subtree rooted at y contains a solution for G with solution indicator y' and 2, None if it doesn't
-def searchTree(y, G, E):
+def searchTree(y, G, E, verbose = True):
     #0 = SOL, 1 = CNT, 2 = CUT
     if(len(y) > len(E)):
         return 2, None
-    x = verifyNode(y, G, E)
+    x = verifyNode(y, G, E, verbose)
     if (x==0): return 0,y
     if (x==1):
         rand = rd.random()
@@ -43,15 +43,15 @@ def searchTree(y, G, E):
         y1.append(1)
         y0.append(0)
         if (rand > 0.8):
-            r,r_y = searchTree(y1, G, E)
+            r,r_y = searchTree(y1, G, E, verbose)
             if (r == 0): return 0, r_y
-            r,r_y = searchTree(y0, G, E)
+            r,r_y = searchTree(y0, G, E, verbose)
             if (r == 0): return 0, r_y
             return 2, None
         else:
-            r,r_y = searchTree(y0, G, E)
+            r,r_y = searchTree(y0, G, E, verbose)
             if (r == 0): return 0, r_y
-            r, r_y = searchTree(y1, G, E)
+            r, r_y = searchTree(y1, G, E, verbose)
             if (r == 0): return 0, r_y
             return 2, None
     if(x == 2):
@@ -117,6 +117,8 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
         removeEdges.append((E[depth+k][1][0],E[depth+k][1][1]))
     Gv.remove_edges_from(removeEdges)
     #E[i] has shape [[a b][x y]]
+
+
     #a = E[index][0][0]
     #b = E[index][0][1]
     #for i in range(a):
@@ -133,6 +135,9 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     #        edgeList.append((a, b))
     #we do not implement c because its too expensive to check with too little gain (we need to check almost n^2 edges for every edge and its rarely true)
     #edges of type d)
+    
+    
+    
     n = len(kite_edges)
     for i in range(n):
         edgeList.append(list(kite_edges)[i])
@@ -169,18 +174,18 @@ def createCrossVertices(y, Gv, E):
     
 #INPUT: indicator y, graph G, edge*edge list E
 #OUTPUT: 0 if y is a solution, 1 if y is potentially part of a solution, 2 if cannot be part of a solution
-def verifyNode(y, G, E):
+def verifyNode(y, G, E, verbose):
     #0 = SOL, 1 = CNT, 2 = CUT
     am = nx.to_numpy_array(G) #gives us the adjacency matrix as an np array
     if(not checkLegalCrossings(y, E)): 
-        print("Failed legal crossing check: ", y)
+        #print("Failed legal crossing check: ", y)
         return 2
     cross_edges = findCrossedEdges(y, E)
     kite_edges = findKiteEdges(y, E, am)
     #note that the check below also takes care of crossings of type (a, b), (b, c) as that makes the crossing edges show up as kite edges
     #while this wasn't intended it works so it stays in, there might be a more elegant way of checking for this exception
     if(cross_edges.intersection(kite_edges) != set()): 
-        print("Failed cross/kite check: ", y)
+        #print("Failed cross/kite check: ", y)
         return 2
 
     Gv = computeInducedGraph(y, G, E, am, cross_edges, kite_edges)
@@ -188,13 +193,14 @@ def verifyNode(y, G, E):
 
     if(nx.check_planarity(Gstar)[0]):
         if(nx.utils.graphs_equal(Gv, G)):
-            nx.draw_planar(Gstar, with_labels = True) 
-            print(" Found planar drawing of G", y)
+            if(verbose):
+                nx.draw_planar(Gstar, with_labels = True) 
+            #print(" Found planar drawing of G", y)
             return 0
         else:
             return 1
     else:
-        print("Failed planarity check: ", y)
+        #print("Failed planarity check: ", y)
         return 2
 
 def createLog(x, y, E, n):
