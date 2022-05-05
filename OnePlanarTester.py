@@ -118,6 +118,7 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     Gv.remove_edges_from(removeEdges)
     #E[i] has shape [[a b][x y]]
 
+    #OLD WONKY CALCULATIONS
 
     #a = E[index][0][0]
     #b = E[index][0][1]
@@ -135,8 +136,6 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
     #        edgeList.append((a, b))
     #we do not implement c because its too expensive to check with too little gain (we need to check almost n^2 edges for every edge and its rarely true)
     #edges of type d)
-    
-    
     
     n = len(kite_edges)
     for i in range(n):
@@ -203,6 +202,8 @@ def verifyNode(y, G, E, verbose):
         #print("Failed planarity check: ", y)
         return 2
 
+#INPUT: solution x,y, edge*edge List E, size of graph n
+#OUTPUT: prints the added vertices and the crossing they represent
 def createLog(x, y, E, n):
     if(x == 2):
         return
