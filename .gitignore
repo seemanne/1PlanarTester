@@ -3,3 +3,6 @@
 log.txt
 .DS_Store
 __pycache__/OnePlanarTester.cpython-39.pyc
+__pycache__/OnePlanarTester.cpython-37.pyc
+__pycache__/OnePlanarTester.cpython-38.pyc
+mptest.py
