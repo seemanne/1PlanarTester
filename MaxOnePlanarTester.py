@@ -3,7 +3,7 @@ import networkx as nx
 import multiprocessing as mp
 
 #INPUT: networkx graph G
-#OUTPUT: bool which is True is G is maximally 1-planar
+#OUTPUT: list of bools indicating whether G remains 1-planar under a specific edge addition
 def maximalityTester(G: nx.Graph):
     l = list(nx.non_edges(G))
     isMaximal = True
@@ -17,6 +17,8 @@ def maximalityTester(G: nx.Graph):
     outputs = pool.map(checkMaximality, gs)
     return outputs
 
+#INPUT: networkx graph G
+#OUTPUT: bool indicating whether G is 1-planar
 def checkMaximality(Graph):
     E = opt.generateE(Graph)
     x ,y = opt.searchTree([],Graph, E, verbose = False)
@@ -25,6 +27,7 @@ def checkMaximality(Graph):
         onePlanar = True
     return onePlanar
 
+#Main function to generate graph and hand it over
 def main():
     adjacency_dict = {
     0: (1, 2, 3, 4, 5, 6, 7),
@@ -40,5 +43,6 @@ def main():
     maximal = maximalityTester(G)
     print(maximal)
 
+#Clownery required for parallel computing to work
 if __name__ == "__main__":
     main()
