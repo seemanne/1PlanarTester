@@ -14,6 +14,7 @@ def maximalityTester(G):
         x, y = opt.searchTree([],Gtemp,E, verbose = False)
         if(x == 0):
             isMaximal = False
+        print("Checked the edge: ", l[i])
     return isMaximal
 
 adjacency_dict = {
