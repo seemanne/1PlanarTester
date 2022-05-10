@@ -4,6 +4,7 @@ import multiprocessing as mp
 
 #INPUT: networkx graph G
 #OUTPUT: list of bools indicating whether G remains 1-planar under a specific edge addition
+#Uses a multiprocessing pool to parallelize the calculations, generating one thread per edge tested
 def maximalityTester(G: nx.Graph):
     l = list(nx.non_edges(G))
     isMaximal = True
