@@ -31,14 +31,14 @@ def checkMaximality(Graph):
 #Main function to generate graph and hand it over
 def main():
     adjacency_dict = {
-    0: (1, 2, 3, 4, 5, 6, 7),
-    1: (0, 2, 3, 4, 5, 6),
+    0: (1, 2, 3, 4, 5, 7),
+    1: (0, 2, 3, 4, 5, 7),
     2: (0, 1, 3),
     3: (0, 1, 2, 4, 5, 7),
     4: (0, 1, 3, 5, 6, 7),
     5: (0, 1, 3, 4, 6, 7),
-    6: (0, 1, 4, 5, 7),
-    7: (0, 3, 4, 5, 6)}
+    6: (4, 5, 7),
+    7: (0, 1, 3, 4, 5, 6)}
     G = nx.Graph(adjacency_dict)
     print(G.edges)
     maximal = maximalityTester(G)
