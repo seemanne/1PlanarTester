@@ -8,7 +8,7 @@ rd.seed(0)
 
 #INPUT: graph G
 #OUTPUT: list of all edge*edge combinations which could represent a legal crossing for G
-def generateE(G):
+def generateE(G: nx.Graph):
     #we generate the set E exactly once to save time by preprocessing, the set itself doesn't change throughout the code
     #E has the shape [[[a1, b1],[x1, y1]]...[[an, bm],[xj, yk]]], so E[i] is the ith crossing pair, E[i][0] the first edge of the ith crossing
     l1 = []
@@ -31,7 +31,7 @@ def generateE(G):
 
 #INPUT: indicator y, graph G, edge*edge list E
 #OUTPUT: 0, y' if the subtree rooted at y contains a solution for G with solution indicator y' and 2, None if it doesn't
-def searchTree(y, G, E, verbose = True):
+def searchTree(y: list, G: nx.Graph, E: np.ndarray, verbose = True):
     #0 = SOL, 1 = CNT, 2 = CUT
     if(len(y) > len(E)):
         return 2, None
@@ -62,7 +62,7 @@ def searchTree(y, G, E, verbose = True):
 
 #INPUT: indicator y, edge*edge list E
 #OUTPUT: bool which is true if no edge is crossed twice for y
-def checkLegalCrossings(y, E):
+def checkLegalCrossings(y: list, E: np.ndarray):
     S = set()
     n = len(y)
     for i in range(n):
@@ -74,7 +74,7 @@ def checkLegalCrossings(y, E):
 
 #INPUT: indicator y, edge*edge list E
 #OUTPUT: set S containing all eges of G which are crossed for y
-def findCrossedEdges(y, E):
+def findCrossedEdges(y: list, E: np.ndarray):
     S = set()
     n = len(y)
     for i in range(n):
@@ -84,7 +84,7 @@ def findCrossedEdges(y, E):
     
 #INPUT: indicator y, edge*edge list E, adjacency matrix am
 #OUTPUT: set S containing all edges of G which would be kite edges for crossings in y
-def findKiteEdges(y, E, am):
+def findKiteEdges(y: list, E: np.ndarray, am: np.ndarray):
     n = len(y)
     S = set()
     for i in range(n):
@@ -100,7 +100,7 @@ def findKiteEdges(y, E, am):
 
 #INPUT: indicator y, graph G, edge*edge list E, set of crossing edges, set of kite edges
 #OUTPUT: the graph Gv induced by the saturated edges
-def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
+def computeInducedGraph(y: list, G: nx.Graph, E: np.ndarray, am: np.ndarray, cross_edges: set, kite_edges: set):
     edgeList = []
     Gv = nx.Graph()
     Gv.add_edges_from(G.edges)
@@ -130,7 +130,7 @@ def computeInducedGraph(y, G , E, am, cross_edges, kite_edges):
 
 #INPUT: indicator y, graph Gv, edge*edge list E
 #OUTPUT: Graph Gtemp representing the planarisation of Gv for the crossings in y
-def createCrossVertices(y, Gv, E):
+def createCrossVertices(y: list, Gv: nx.Graph, E: np.ndarray):
     #figure out the size of the graph so we know how to label our edges, keep in mind that the label of the last vertex is n-1 (index at zero but count at 1)
     m = len(y)
     j = 0
@@ -156,7 +156,7 @@ def createCrossVertices(y, Gv, E):
     
 #INPUT: indicator y, graph G, edge*edge list E
 #OUTPUT: 0 if y is a solution, 1 if y is potentially part of a solution, 2 if cannot be part of a solution
-def verifyNode(y, G, E, verbose):
+def verifyNode(y: list, G: nx.Graph, E: np.ndarray, verbose: bool):
     #0 = SOL, 1 = CNT, 2 = CUT
     am = nx.to_numpy_array(G) #gives us the adjacency matrix as an np array
     if(not checkLegalCrossings(y, E)): 
@@ -187,7 +187,7 @@ def verifyNode(y, G, E, verbose):
 
 #INPUT: solution x,y, edge*edge List E, size of graph n
 #OUTPUT: prints the added vertices and the crossing they represent
-def createLog(x, y, E, n):
+def createLog(x: int, y: list, E: np.ndarray, n: int):
     if(x == 2):
         return
     m = len(y)

@@ -20,7 +20,7 @@ def maximalityTester(G: nx.Graph):
 
 #INPUT: networkx graph G
 #OUTPUT: bool indicating whether G is 1-planar
-def checkMaximality(Graph):
+def checkMaximality(Graph: nx.Graph):
     E = opt.generateE(Graph)
     x ,y = opt.searchTree([],Graph, E, verbose = False)
     onePlanar = False
